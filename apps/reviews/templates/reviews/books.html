@@ -1,0 +1,17 @@
+<html>
+<head>
+  <title>Login and Registration</title>
+</head>
+  <body>
+    {% if messages %}
+      {% for message in messages %}
+        {{ message.message }}
+      {% endfor %}
+    {% endif %}
+    <h2>Success! Welcome, {{ user.first_name }}</h2>
+    <form action='/logout' method='post'>
+      {% csrf_token %}
+      <input type='submit' value='Log Out'>
+    </form>
+  </body>
+</html>
