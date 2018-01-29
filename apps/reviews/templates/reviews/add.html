@@ -19,8 +19,20 @@
       {% csrf_token %}
       Book Title: <input type='text' name='title'>
       <p>Author</p>
+      <select name="author-from-list">
+        {% for author in authors %}
+          <option value="{{ author.author }}">{{ author.author }}</option>
+        {% endfor %}
+      </select>
       Or add a new author: <input type='text' name='author'>
       Review: <textarea rows="4" cols="50" name="review"></textarea>
+      Rating: <select name="rating">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option selected="selected" value="5">5</option>
+              </select> stars
       <input type='submit' value='Add Book and Review'>
     </form>
 

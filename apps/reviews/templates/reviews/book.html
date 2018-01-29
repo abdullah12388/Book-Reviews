@@ -14,13 +14,16 @@
     <a href="/logout">Log Out</a>
 
     <h2>{{ book.title }}</h2>
-
+    Author: {{ book.author }}
     <div class="section">
       <h4>Reviews:</h4>
       {% for review in reviews %}
-        <p>{{ review.rating }}</p>
-        <p><a href="/users/{{ review.user.id }}">{{ review.user.alias}}</a> says: {{ review.review }}</p>
+        <p>Rating: {{ review.rating }}</p>
+        <p><a href="/users/{{ review.user.id }}">{{ review.user.alias }}</a> says: {{ review.review }}</p>
         <p>Posted on {{ review.created_at }}</p>
+        {% if review.user.id == request.session.user_id %}
+          <a href="/delete/{{ review.id }}">Delete this Review</a></p>
+        {% endif %}
         <hr>
       {% endfor %}
     </div>
@@ -29,6 +32,13 @@
       <form action='/books/submit_review/{{ book.id }}' method='post'>
         {% csrf_token %}
         Review: <textarea rows="4" cols="50" name="review"></textarea>
+        Rating: <select name="rating">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option selected="selected" value="5">5</option>
+                </select> stars
         <input type='submit' value='Submit Review'>
       </form>
     </div>
