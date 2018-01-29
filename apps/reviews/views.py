@@ -8,15 +8,7 @@ def index(request):
     if request=='POST':
         return redirect('/')
     else:
-        return render(request, 'log_and_reg/index.html')
-
-def success(request):
-    # Check if the user logged in
-    if request.session['user_id']:
-        return render(request, 'log_and_reg/success.html',
-                {"user": User.objects.get(id=request.session['user_id'])})
-    else:
-        return redirect('/')
+        return render(request, 'reviews/index.html')
 
 def processRegistration(request):
     # Check if entered info is valid
@@ -35,14 +27,15 @@ def processRegistration(request):
         except:
             first_name = request.POST['first_name']
             last_name = request.POST['last_name']
+            alias = request.POST['alias']
             password = bcrypt.hashpw(request.POST['password'].encode(),
                     bcrypt.gensalt())
             # Create a new user
             this_user = User.objects.create(first_name = first_name,
-                    last_name = last_name, email = email, password = password)
+                    last_name = last_name, alias=alias, email = email, password = password)
             request.session['user_id'] = this_user.id
             errors["success"] = "Successfully registered (or logged in)!"
-            return redirect('/success')
+            return redirect('/books')
 
 def processLogin(request):
     email = request.POST['email']
@@ -53,13 +46,72 @@ def processLogin(request):
                 request.POST['password'].encode(), this_user.password.encode()):
             request.session['user_id'] = this_user.id
             messages.error(request, "Successfully registered (or logged in)!")
-            return redirect('/success')
+            return redirect('/books')
         else:
             messages.error(request, "Wrong password")
             return redirect('/')
     except:
         messages.error(request, "Email not found")
         return redirect('/')
+
+def showBooks(request):
+    if request.session['user_id']:
+        recent_reviews = Review.objects.all().order_by('-created_at')[:3]
+        this_user = User.objects.get(id=request.session['user_id'])
+        return render(request, 'reviews/books.html',
+                {"recent_reviews": recent_reviews, "user": this_user, "books": Book.objects.all()})
+    else:
+        return redirect('/')
+
+def showAddForm(request):
+    if request.session['user_id']:
+        return render(request, 'reviews/add.html')
+    else:
+        return redirect('/')
+
+def addBook(request):
+    # Check if entered data is valid
+    title = request.POST['title']
+    author = request.POST['author']
+    uploader = request.session['user_id']
+    review = request.POST['review']
+    rating = "5"
+    this_user = User.objects.get(id=request.session['user_id'])
+    this_book = Book.objects.create(title=title, author=author, uploader=this_user)
+    this_book.reviewed_users.add(this_user)
+    this_user.reviewed_books.add(this_book)
+    Review.objects.create(review=review, rating=rating, book=this_book, user=this_user)
+    return redirect('/books/'+str(this_book.id))
+
+def showOneBook(request, number):
+    if request.session['user_id']:
+        this_book = Book.objects.get(id=number)
+        print this_book
+        return render(request, 'reviews/book.html', {"reviews": Review.objects.filter(book=this_book), "book": this_book})
+    else:
+        return redirect('/')
+
+def addReview(request, number):
+    # Check if entered data is valid
+
+    uploader = request.session['user_id']
+    review = request.POST['review']
+    rating = "5"
+    this_user = User.objects.get(id=request.session['user_id'])
+    this_book = Book.objects.get(id=number)
+    this_book.reviewed_users.add(this_user)
+    this_user.reviewed_books.add(this_book)
+    Review.objects.create(review=review, rating=rating, book=this_book, user=this_user)
+    return redirect('/books/'+str(this_book.id))
+
+def showUser(request, number):
+    if request.session['user_id']:
+        this_user = User.objects.get(id=number)
+        count = Review.objects.filter(user=this_user).count()
+        return render(request, 'reviews/user.html', {"user": this_user, "reviews": Review.objects.filter(user=this_user), "count": count})
+    else:
+        return redirect('/')
+
 
 def logout(request):
     request.session['user_id'] = None

@@ -1,0 +1,28 @@
+<html>
+<head>
+  <title>Login and Registration</title>
+</head>
+  <body>
+    {% if messages %}
+      {% for message in messages %}
+        {{ message.message }}
+      {% endfor %}
+    {% endif %}
+    
+
+    <a href="/books">Home</a>
+    <a href="/books/add">Add Book and Review</a>
+    <a href="/logout">Log Out</a>
+
+    <p><h4>User Alias: {{ user.alias }}</h4></p>
+    <p>Name: {{ user.first_name }} {{ user.last_name }}</p>
+    <p>Email: {{ user.email }}</p>
+    <p>Total Reviews: {{ count }}</p>
+
+    <p>Posted Reviews on the following books:</p>
+    {% for review in reviews %}
+      <p><a href="/books/{{ review.book.id }}">{{ review.book.title }}</a></p>
+    {% endfor %}
+
+  </body>
+</html>

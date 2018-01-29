@@ -8,26 +8,29 @@
         {{ message.message }}
       {% endfor %}
     {% endif %}
-    <h2>Welcome, {{ user.first_name }}</h2>
 
 
-    <a href="/books/add">Add Book and Review</a>
+    <a href="/books">Home</a>
     <a href="/logout">Log Out</a>
 
+    <h2>{{ book.title }}</h2>
+
     <div class="section">
-      <h4>Recent Book Reviews:</h4>
-      {% for review in recent_reviews %}
-        <p><a href="/books/{{review.book.id}}">{{ review.book.title }}</a></p>
-        <p>Rating: {{ review.rating }}</p>
+      <h4>Reviews:</h4>
+      {% for review in reviews %}
+        <p>{{ review.rating }}</p>
         <p><a href="/users/{{ review.user.id }}">{{ review.user.alias}}</a> says: {{ review.review }}</p>
-        <p>Posted on: {{ review.created_at }}</p>
+        <p>Posted on {{ review.created_at }}</p>
+        <hr>
       {% endfor %}
     </div>
     <div class="section">
-      <h4>Other Books with Reviews:</h4>
-      {% for book in books %}
-        <p><a href="/books/{{book.id}}">{{ book.title }}</a><p>
-      {% endfor %}
+      <h4>Add a Review:</h4>
+      <form action='/books/submit_review/{{ book.id }}' method='post'>
+        {% csrf_token %}
+        Review: <textarea rows="4" cols="50" name="review"></textarea>
+        <input type='submit' value='Submit Review'>
+      </form>
     </div>
 
     <form action='/logout' method='post'>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Login and Registration</title>
+  </head>
+  <body>
+    {% if messages %}
+      {% for message in messages %}
+        {{ message.message }}
+      {% endfor %}
+    {% endif %}
+
+    <a href="/books">Home</a>
+    <a href="/logout">Log Out</a>
+
+    <h2>Add a New Book Title and a Review</h2>
+    <form action='/books/submit' method='post'>
+      {% csrf_token %}
+      Book Title: <input type='text' name='title'>
+      <p>Author</p>
+      Or add a new author: <input type='text' name='author'>
+      Review: <textarea rows="4" cols="50" name="review"></textarea>
+      <input type='submit' value='Add Book and Review'>
+    </form>
+
+  </body>
+</html>
